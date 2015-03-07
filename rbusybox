@@ -1,0 +1,26 @@
+#!/bin/bash
+#
+#usage: rbusybox <user> <host> <command>
+
+BUSYBOX=/usr/sbin/busybox
+REMOTEUSER=$1
+REMOTEHOST=$2
+COMMAND=$3
+
+if [ "$#" -lt 3 ];
+then echo "usage: rbusybox <user> <host> command>"
+exit 1
+fi
+
+if [ -z "$SSHPASS" ]; then
+echo "SSHPASS Environment variable not set. Enter Password:"
+read -s password
+export SSHPASS=${password}
+fi
+
+
+ssh -o StrictHostKeyChecking=no
+sshpass -e scp ${BUSYBOX} ${REMOTEUSER}@${REMOTEHOST}:
+sshpass -e ssh ${REMOTEUSER}@${REMOTEHOST} ./busybox ${COMMAND}
+sshpass -e ssh ${REMOTEUSER}@${REMOTEHOST} ./busybox rm -f ./busybox
+
